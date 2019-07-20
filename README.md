@@ -16,7 +16,8 @@ Compile things with `make`.
 Temporarily disable default norns stuff by running
 `sh kill_stuff.sh`. This stops supercollider, matron,
 and crone. Rebooting the machine will restart these
-for you.
+for you. I do this by running `poweroff', then manually
+powering on the device.
 
 Run a program. Right now, the only thing is a framebuffer
 test.

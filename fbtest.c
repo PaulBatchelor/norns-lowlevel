@@ -27,7 +27,7 @@ void pixel(struct fb_var_screeninfo *vinfo,
            int y,
            unsigned char val)
 {
-    int location;
+    long int location;
 
     if(x >= vinfo->xres || y >= vinfo->yres) return;
 
@@ -78,8 +78,6 @@ int main()
     struct fb_fix_screeninfo finfo;
     long int screensize = 0;
     char *fbp = 0;
-    int x = 0, y = 0;
-    long int location = 0;
 
     fbfd = open("/dev/fb0", O_RDWR);
     if (fbfd == -1) {

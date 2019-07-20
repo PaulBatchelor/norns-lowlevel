@@ -1,5 +1,7 @@
+CFLAGS=-Wall -pedantic -std=c89 -O2
+
 fbtest: fbtest.c
-	$(CC) $< -o $@
+	$(CC) $(CFLAGS) $< -o $@
 
 
 clean:
