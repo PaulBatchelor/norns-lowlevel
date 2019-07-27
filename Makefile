@@ -19,4 +19,5 @@ clean:
 	$(RM) fbtest
 	$(RM) knob
 	$(RM) button
+	$(RM) input_monitor
 
