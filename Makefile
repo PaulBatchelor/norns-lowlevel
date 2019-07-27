@@ -6,7 +6,7 @@ CFLAGS += -static --static
 CC=arm-linux-musleabihf-gcc
 
 
-default: fbtest knob button
+default: fbtest knob button input_monitor
 
 fbtest: fbtest.c
 	$(CC) $(CFLAGS) $< -o $@
