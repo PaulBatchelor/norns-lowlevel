@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -27,7 +28,7 @@ int main(int argc, char *argv[])
     signal(SIGINT, quit);
 
     fid = open(
-        "/dev/input/by-path/platform-soc:knob1-event",
+        "/dev/input/by-path/platform-keys-event",
         O_RDONLY | O_NONBLOCK);
 
 
@@ -39,7 +40,10 @@ int main(int argc, char *argv[])
             nevts = rc / sizeof(struct input_event);
             for(e = 0; e < nevts; e++) {
                 if(evt[e].type) {
-                    fprintf(stdout, "%d\n", evt[e].value);
+                    fprintf(stdout,
+                            "%d %d\n",
+                            evt[e].code,
+                            evt[e].value);
                     fflush(stdout);
                 }
             }
