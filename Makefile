@@ -14,6 +14,12 @@ fbtest: fbtest.c
 knob: knob.c
 	$(CC) $(CFLAGS) $< -o $@
 
+button: button.c
+	$(CC) $(CFLAGS) $< -o $@
+
+input_monitor: input_monitor.c
+	$(CC) $(CFLAGS) $< -o $@
+
 
 clean:
 	$(RM) fbtest
