@@ -116,7 +116,8 @@ int main(int argc, char *argv[])
     out[1] = NULL;
     client = NULL;
     audio_start();
-    sleep(10);
+    printf("Hit any key to stop.\n");
+    fgetc(stdin);
     audio_stop();
     return 0;
 }
