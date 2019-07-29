@@ -3,23 +3,26 @@ CFLAGS += -static --static
 
 # Use musl cross compiler
 
-CC=arm-linux-musleabihf-gcc
-
+CROSS-CC=arm-linux-musleabihf-gcc
 
 default: fbtest knob button input_monitor
 
+native: audio
+
 fbtest: fbtest.c
-	$(CC) $(CFLAGS) $< -o $@
+	$(CROSS-CC) $(CFLAGS) $< -o $@
 
 knob: knob.c
-	$(CC) $(CFLAGS) $< -o $@
+	$(CROSS-CC) $(CFLAGS) $< -o $@
 
 button: button.c
-	$(CC) $(CFLAGS) $< -o $@
+	$(CROSS-CC) $(CFLAGS) $< -o $@
 
 input_monitor: input_monitor.c
-	$(CC) $(CFLAGS) $< -o $@
+	$(CROSS-CC) $(CFLAGS) $< -o $@
 
+audio: audio.c
+	$(CC) -Inorns/include $< -o $@ -Lnorns/lib -ljack
 
 clean:
 	$(RM) fbtest
