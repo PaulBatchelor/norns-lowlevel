@@ -9,7 +9,7 @@ CFLAGS += -D_GNU_SOURCE
 
 CROSS-CC=arm-linux-musleabihf-gcc
 
-default: fbtest knob button input_monitor
+default: fbtest knob button input_monitor demo
 
 # native stuff must be compiled on norns itself
 
@@ -27,6 +27,9 @@ button: button.c
 input_monitor: input_monitor.c
 	$(CROSS-CC) $(CFLAGS) $< -o $@
 
+demo: demo.c
+	$(CROSS-CC) $(CFLAGS) $< -o $@
+
 audio: audio.c
 	$(CC) -Inorns/include $< -o $@ -Lnorns/lib -ljack
 
@@ -35,4 +38,6 @@ clean:
 	$(RM) knob
 	$(RM) button
 	$(RM) input_monitor
+	$(RM) demo
+	$(RM) audio
 
