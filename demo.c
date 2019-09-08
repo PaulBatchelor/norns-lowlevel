@@ -34,6 +34,8 @@ typedef struct {
     int please_draw;
     jack_port_t *out[2];
     jack_client_t *client;
+    float lphs;
+    int sr;
 } main_data;
 
 void quit(int sig)
@@ -224,6 +226,7 @@ static int jack_process(jack_nframes_t nframes, void *arg)
     jack_default_audio_sample_t *o[2];
     int n;
     float smp;
+    float frq;
     main_data *m;
 
     jack_port_t **out;
@@ -237,11 +240,13 @@ static int jack_process(jack_nframes_t nframes, void *arg)
     o[1] = (jack_default_audio_sample_t*)jack_port_get_buffer(out[1], nframes);
 
     for(n = 0; n < nframes; n++) {
-        smp = (float)rand() / RAND_MAX;
-        smp = (2 * smp) - 1;
+        smp = sin(m->lphs);
         smp *= m->vals[0];
         o[0][n] = smp;
         o[1][n] = smp;
+        frq = 200 + 500 * m->vals[1];
+        m->lphs += (float)frq * ((2.0 * M_PI) / m->sr);
+        m->lphs = fmod(m->lphs, 2.0 * M_PI);
     }
 
     return 0;
@@ -362,6 +367,8 @@ int main(int argc, char *argv[])
 
     pthread_create(&draw_thread, NULL, draw, &m);
     m.client = NULL;
+    m.lphs = 0;
+    m.sr = 44100; /* TODO: make this dynamic */
     audio_start(&m);
 
     while (running) {
@@ -390,9 +397,9 @@ int main(int argc, char *argv[])
         usleep(800);
     }
 
+    audio_stop(&m);
     pthread_join(draw_thread, NULL);
     for (k = 0; k < 3; k++) close(fid[k]);
     fb_cleanup(&m.fb);
-    audio_stop(&m);
     return 0;
 }
