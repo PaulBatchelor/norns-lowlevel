@@ -28,6 +28,8 @@ typedef struct {
     unsigned char *buf;
 } framebuffer;
 
+#define BUFSIZE 62
+
 typedef struct {
     framebuffer fb;
     float vals[3];
@@ -36,6 +38,9 @@ typedef struct {
     jack_client_t *client;
     float lphs;
     int sr;
+    int counter;
+    int subcount;
+    float buf[4096];
 } main_data;
 
 void quit(int sig)
@@ -139,6 +144,45 @@ void vslider(framebuffer *fb, int x, int y, float val)
 
 }
 
+void wavedisplay(framebuffer *fb, float *buf, int size)
+{
+    float x, y;
+    float w, h;
+    int n;
+    float val;
+    int pos;
+    int jmp;
+
+    x = 48;
+    y = 24;
+
+    w = 64;
+    h = 32;
+
+    for(n = 0; n < w; n++) {
+        pixel(fb, x+n, y, 255);
+    }
+
+    for(n = 0; n < w; n++) {
+        pixel(fb, x+n, y + h - 1, 255);
+    }
+
+    for(n = 0; n < h; n++) {
+        pixel(fb, x, y + n, 255);
+    }
+
+    for(n = 0; n < h; n++) {
+        pixel(fb, x + w - 1, y + n, 255);
+    }
+
+    for(n = 0; n < 62; n++) {
+        val = buf[n];
+        val = 1 - ((val + 1) * 0.5);
+        pos = floor(val * 30);
+        pixel(fb, x + 1 + n, y + pos, 255);
+    }
+}
+
 void* draw(void *data)
 {
     framebuffer *fb;
@@ -157,6 +201,7 @@ void* draw(void *data)
             vslider(fb, 16, 24, m->vals[0]);
             vslider(fb, 24, 24, m->vals[1]);
             vslider(fb, 32, 24, m->vals[2]);
+            wavedisplay(fb, m->buf, 4096);
             m->please_draw = 0;
             copy_to_fb(fb);
         }
@@ -244,9 +289,18 @@ static int jack_process(jack_nframes_t nframes, void *arg)
         smp *= m->vals[0];
         o[0][n] = smp;
         o[1][n] = smp;
-        frq = 200 + 500 * m->vals[1];
+        frq = 200 + 2000 * m->vals[1];
         m->lphs += (float)frq * ((2.0 * M_PI) / m->sr);
         m->lphs = fmod(m->lphs, 2.0 * M_PI);
+        if(m->subcount == 0) {
+            m->buf[m->counter] = smp;
+        }
+        m->counter++;
+        if(m->counter >= BUFSIZE) {
+            m->counter = 0;
+            if(m->subcount == 0) m->please_draw = 1;
+            m->subcount = (m->subcount + 1) % 8;
+        }
     }
 
     return 0;
@@ -368,6 +422,8 @@ int main(int argc, char *argv[])
     pthread_create(&draw_thread, NULL, draw, &m);
     m.client = NULL;
     m.lphs = 0;
+    m.counter = 0;
+    m.subcount = 0;
     m.sr = 44100; /* TODO: make this dynamic */
     audio_start(&m);
 
