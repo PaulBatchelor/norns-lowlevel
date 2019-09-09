@@ -1,5 +1,5 @@
 CFLAGS=-Wall -pedantic -std=c89 -O2
-CFLAGS += -static --static
+#CFLAGS += -static --static
 
 # Needed to remove usleep warning
 # (this warning because the compiler is enforcing ANSI C)
@@ -7,7 +7,7 @@ CFLAGS += -D_GNU_SOURCE
 
 # Use musl cross compiler
 
-CROSS-CC=arm-linux-musleabihf-gcc
+CROSS-CC=arm-linux-gnueabihf-gcc
 
 default: fbtest knob button input_monitor
 
@@ -28,10 +28,10 @@ input_monitor: input_monitor.c
 	$(CROSS-CC) $(CFLAGS) $< -o $@
 
 demo: demo.c
-	$(CC) -Inorns/include $< -o $@ -Lnorns/lib -ljack -lpthread -lm
+	$(CROSS-CC) -Inorns/include $< -o $@ -ljack -lpthread -lm
 
 audio: audio.c
-	$(CC) -Inorns/include $< -o $@ -Lnorns/lib -ljack
+	$(CROSS-CC) -Inorns/include $< -o $@ -Lnorns/lib -ljack
 
 clean:
 	$(RM) fbtest
