@@ -41,6 +41,7 @@ typedef struct {
     int counter;
     int subcount;
     float buf[4096];
+    int mute;
 } main_data;
 
 void quit(int sig)
@@ -56,6 +57,13 @@ int open_knob(int knob)
             "/dev/input/by-path/platform-soc:knob%d-event",
             knob);
     return open(path, O_RDONLY | O_NONBLOCK);
+}
+
+int open_buttons(void)
+{
+    return open(
+        "/dev/input/by-path/platform-keys-event",
+        O_RDONLY | O_NONBLOCK);
 }
 
 void pixel(framebuffer *fb,
@@ -273,6 +281,7 @@ static int jack_process(jack_nframes_t nframes, void *arg)
     float smp;
     float frq;
     main_data *m;
+    float gate;
 
     jack_port_t **out;
     jack_client_t *client;
@@ -284,9 +293,10 @@ static int jack_process(jack_nframes_t nframes, void *arg)
     o[0] = (jack_default_audio_sample_t*)jack_port_get_buffer(out[0], nframes);
     o[1] = (jack_default_audio_sample_t*)jack_port_get_buffer(out[1], nframes);
 
+    gate = m->mute == 0;
     for(n = 0; n < nframes; n++) {
         smp = sin(m->lphs);
-        smp *= m->vals[0];
+        smp *= m->vals[0] * gate;
         o[0][n] = smp;
         o[1][n] = smp;
         frq = 200 + 2000 * m->vals[1];
@@ -398,6 +408,7 @@ void audio_stop(main_data *m)
 int main(int argc, char *argv[])
 {
     int fid[3];
+    int bfid;
     int rc;
     struct input_event evt[8];
     int nevts;
@@ -407,6 +418,9 @@ int main(int argc, char *argv[])
     main_data m;
     int pd;
     float tmp;
+    int val;
+    int code;
+    int please_poweroff;
 
     signal(SIGINT, quit);
 
@@ -416,6 +430,7 @@ int main(int argc, char *argv[])
         fid[k] = open_knob(k + 1);
         m.vals[k] = 0;
     }
+    bfid = open_buttons();
 
     running = 1;
 
@@ -425,6 +440,8 @@ int main(int argc, char *argv[])
     m.counter = 0;
     m.subcount = 0;
     m.sr = 44100; /* TODO: make this dynamic */
+    m.mute = 0;
+    please_poweroff = 0;
     audio_start(&m);
 
     while (running) {
@@ -449,6 +466,33 @@ int main(int argc, char *argv[])
                 }
             }
         }
+        rc = read(bfid, evt, sizeof(struct input_event) * 8);
+        if(rc != -1) {
+            nevts = rc / sizeof(struct input_event);
+            for(e = 0; e < nevts; e++) {
+                if(evt[e].type) {
+                    fprintf(stdout,
+                            "%d %d\n",
+                            evt[e].code,
+                            evt[e].value);
+                    fflush(stdout);
+
+                    val = evt[e].value;
+                    code = evt[e].code;
+                    switch(code) {
+                        case 1:
+                            quit(0);
+                            please_poweroff = 1;
+                            break;
+                        case 2:
+                            m.mute = val == 1;
+                            break;
+                        case 3:
+                            break;
+                    }
+                }
+            }
+        }
         m.please_draw = pd;
         usleep(800);
     }
@@ -456,6 +500,10 @@ int main(int argc, char *argv[])
     audio_stop(&m);
     pthread_join(draw_thread, NULL);
     for (k = 0; k < 3; k++) close(fid[k]);
+    close(bfid);
     fb_cleanup(&m.fb);
+    if(please_poweroff) {
+        system("poweroff");
+    }
     return 0;
 }

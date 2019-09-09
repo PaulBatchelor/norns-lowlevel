@@ -9,7 +9,7 @@ CFLAGS += -D_GNU_SOURCE
 
 CROSS-CC=arm-linux-gnueabihf-gcc
 
-default: fbtest knob button input_monitor
+default: fbtest knob button input_monitor demo
 
 # native stuff must be compiled on norns itself
 
