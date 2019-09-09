@@ -7,31 +7,27 @@ CFLAGS += -D_GNU_SOURCE
 
 # Use musl cross compiler
 
-CROSS-CC=arm-linux-gnueabihf-gcc
+CC=arm-linux-gnueabihf-gcc
 
-default: fbtest knob button input_monitor demo
-
-# native stuff must be compiled on norns itself
-
-native: audio demo
+default: fbtest knob button input_monitor demo audio
 
 fbtest: fbtest.c
-	$(CROSS-CC) $(CFLAGS) $< -o $@
+	$(CC) $(CFLAGS) $< -o $@
 
 knob: knob.c
-	$(CROSS-CC) $(CFLAGS) $< -o $@
+	$(CC) $(CFLAGS) $< -o $@
 
 button: button.c
-	$(CROSS-CC) $(CFLAGS) $< -o $@
+	$(CC) $(CFLAGS) $< -o $@
 
 input_monitor: input_monitor.c
-	$(CROSS-CC) $(CFLAGS) $< -o $@
+	$(CC) $(CFLAGS) $< -o $@
 
 demo: demo.c
-	$(CROSS-CC) -Inorns/include $< -o $@ -ljack -lpthread -lm
+	$(CC) -Inorns/include $< -o $@ -ljack -lpthread -lm
 
 audio: audio.c
-	$(CROSS-CC) -Inorns/include $< -o $@ -Lnorns/lib -ljack
+	$(CC) -Inorns/include $< -o $@ -Lnorns/lib -ljack
 
 clean:
 	$(RM) fbtest
