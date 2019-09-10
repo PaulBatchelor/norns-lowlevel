@@ -1,11 +1,8 @@
 CFLAGS=-Wall -pedantic -std=c89 -O2
-#CFLAGS += -static --static
 
 # Needed to remove usleep warning
 # (this warning because the compiler is enforcing ANSI C)
 CFLAGS += -D_GNU_SOURCE
-
-# Use musl cross compiler
 
 CC=arm-linux-gnueabihf-gcc
 
