@@ -6,7 +6,7 @@ CFLAGS += -D_GNU_SOURCE
 
 CC=arm-linux-gnueabihf-gcc
 
-default: fbtest knob button input_monitor demo audio
+default: fbtest knob button input_monitor demo audio text
 
 fbtest: fbtest.c
 	$(CC) $(CFLAGS) $< -o $@
@@ -26,6 +26,9 @@ demo: demo.c
 audio: audio.c
 	$(CC) -Inorns/include $< -o $@ -Lnorns/lib -ljack
 
+text: text.c
+	$(CC) $(CFLAGS) $< -o $@
+
 clean:
 	$(RM) fbtest
 	$(RM) knob
@@ -33,4 +36,5 @@ clean:
 	$(RM) input_monitor
 	$(RM) demo
 	$(RM) audio
+	$(RM) text
 
