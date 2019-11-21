@@ -88,8 +88,8 @@ void copy_to_fb(framebuffer *fb)
 
     h = fb->vinfo.yres;
     w = fb->vinfo.xres;
-    for(y = 0; y < h; y++) {
-        for(x = 0; x < w; x++) {
+    for (y = 0; y < h; y++) {
+        for (x = 0; x < w; x++) {
             location = (x + fb->vinfo.xoffset) *
                 (fb->vinfo.bits_per_pixel/8) +
                 (y + fb->vinfo.yoffset) * fb->finfo.line_length;
@@ -104,7 +104,7 @@ void clearscreen(framebuffer *fb)
 {
     int x, y;
 
-    for(y = 0; y < fb->vinfo.yres; y++) {
+    for (y = 0; y < fb->vinfo.yres; y++) {
         for(x = 0; x < fb->vinfo.xres; x++) {
             pixel(fb, x, y, 0);
         }
@@ -144,7 +144,7 @@ void vslider(framebuffer *fb, int x, int y, float val)
     /* draw value */
 
     nlines = round(val * 28);
-    for(k = 0; k < nlines; k++) {
+    for (k = 0; k < nlines; k++) {
         for (n = 0; n < (w - 4); n++) {
             pixel(fb, x + 2 + n, (y + (h - k) - 3), 255);
         }
@@ -167,23 +167,23 @@ void wavedisplay(framebuffer *fb, float *buf, int size)
     w = 64;
     h = 32;
 
-    for(n = 0; n < w; n++) {
+    for (n = 0; n < w; n++) {
         pixel(fb, x+n, y, 255);
     }
 
-    for(n = 0; n < w; n++) {
+    for (n = 0; n < w; n++) {
         pixel(fb, x+n, y + h - 1, 255);
     }
 
-    for(n = 0; n < h; n++) {
+    for (n = 0; n < h; n++) {
         pixel(fb, x, y + n, 255);
     }
 
-    for(n = 0; n < h; n++) {
+    for (n = 0; n < h; n++) {
         pixel(fb, x + w - 1, y + n, 255);
     }
 
-    for(n = 0; n < 62; n++) {
+    for (n = 0; n < 62; n++) {
         val = buf[n];
         val = 1 - ((val + 1) * 0.5);
         pos = floor(val * 30);
@@ -201,7 +201,7 @@ void* draw(void *data)
     fb = &m->fb;
 
     clearscreen(fb);
-    while(running) {
+    while (running) {
         draw = m->please_draw;
 
         if(draw) {
@@ -294,7 +294,7 @@ static int jack_process(jack_nframes_t nframes, void *arg)
     o[1] = (jack_default_audio_sample_t*)jack_port_get_buffer(out[1], nframes);
 
     gate = m->mute == 0;
-    for(n = 0; n < nframes; n++) {
+    for (n = 0; n < nframes; n++) {
         smp = sin(m->lphs);
         smp *= m->vals[0] * gate;
         o[0][n] = smp;
@@ -302,13 +302,16 @@ static int jack_process(jack_nframes_t nframes, void *arg)
         frq = 200 + 2000 * m->vals[1];
         m->lphs += (float)frq * ((2.0 * M_PI) / m->sr);
         m->lphs = fmod(m->lphs, 2.0 * M_PI);
-        if(m->subcount == 0) {
+
+        if (m->subcount == 0) {
             m->buf[m->counter] = smp;
         }
+
         m->counter++;
-        if(m->counter >= BUFSIZE) {
+
+        if (m->counter >= BUFSIZE) {
             m->counter = 0;
-            if(m->subcount == 0) m->please_draw = 1;
+            if (m->subcount == 0) m->please_draw = 1;
             m->subcount = (m->subcount + 1) % 8;
         }
     }
@@ -330,7 +333,7 @@ void audio_start(main_data *m)
     out = m->out;
     client = m->client;
 
-    if(client != NULL) {
+    if (client != NULL) {
         fprintf(stderr, "JACK audio server seems to be started already\n");
         return;
     }
@@ -342,7 +345,7 @@ void audio_start(main_data *m)
 
     client = jack_client_open(client_name, options, &status, server_name);
 
-    if(client == NULL) {
+    if (client == NULL) {
         fprintf(stderr, "JACK has failed you.\n");
         if (status & JackServerFailed) {
             fprintf (stderr, "It was unable to connect to the JACK server\n");
@@ -368,12 +371,12 @@ void audio_start(main_data *m)
                                     JACK_DEFAULT_AUDIO_TYPE,
                                     JackPortIsOutput, 0);
 
-    if((out[0] == NULL) || (out[1] == NULL)) {
+    if ((out[0] == NULL) || (out[1] == NULL)) {
         fprintf(stderr, "no more JACK ports available\n");
         return;
     }
 
-    if(jack_activate(client)) {
+    if (jack_activate(client)) {
         fprintf(stderr, "cannot activate client\n");
         return;
     }
@@ -467,10 +470,10 @@ int main(int argc, char *argv[])
             }
         }
         rc = read(bfid, evt, sizeof(struct input_event) * 8);
-        if(rc != -1) {
+        if (rc != -1) {
             nevts = rc / sizeof(struct input_event);
-            for(e = 0; e < nevts; e++) {
-                if(evt[e].type) {
+            for (e = 0; e < nevts; e++) {
+                if (evt[e].type) {
                     fprintf(stdout,
                             "%d %d\n",
                             evt[e].code,
@@ -479,7 +482,7 @@ int main(int argc, char *argv[])
 
                     val = evt[e].value;
                     code = evt[e].code;
-                    switch(code) {
+                    switch (code) {
                         case 1:
                             quit(0);
                             please_poweroff = 1;
@@ -502,7 +505,7 @@ int main(int argc, char *argv[])
     for (k = 0; k < 3; k++) close(fid[k]);
     close(bfid);
     fb_cleanup(&m.fb);
-    if(please_poweroff) {
+    if (please_poweroff) {
         system("poweroff");
     }
     return 0;

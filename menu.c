@@ -27,7 +27,7 @@ void pixel(struct fb_var_screeninfo *vinfo,
 {
     long int location;
 
-    if(x >= vinfo->xres || y >= vinfo->yres) return;
+    if (x >= vinfo->xres || y >= vinfo->yres) return;
 
     location = (x + vinfo->xoffset) * (vinfo->bits_per_pixel/8) +
                (y + vinfo->yoffset) * finfo->line_length;
@@ -42,8 +42,8 @@ void clearscreen(struct fb_var_screeninfo *vinfo,
 {
     int x, y;
 
-    for(y = 0; y < vinfo->yres; y++) {
-        for(x = 0; x < vinfo->xres; x++) {
+    for (y = 0; y < vinfo->yres; y++) {
+        for (x = 0; x < vinfo->xres; x++) {
             pixel(vinfo, finfo, fbp, x, y, 0);
         }
     }
@@ -305,7 +305,7 @@ int main()
             }
         }
         rc = read(bfid, evt, sizeof(struct input_event) * 8);
-        if(rc != -1) {
+        if (rc != -1) {
             nevts = rc / sizeof(struct input_event);
             for(e = 0; e < nevts; e++) {
                 if(evt[e].type) {
@@ -316,7 +316,7 @@ int main()
                     fflush(stdout);
 
                     code = evt[e].code;
-                    switch(code) {
+                    switch (code) {
                         case 1:
                             running = 0;
                             break;

@@ -29,7 +29,7 @@ void pixel(struct fb_var_screeninfo *vinfo,
 {
     long int location;
 
-    if(x >= vinfo->xres || y >= vinfo->yres) return;
+    if (x >= vinfo->xres || y >= vinfo->yres) return;
 
     location = (x + vinfo->xoffset) * (vinfo->bits_per_pixel/8) +
                (y + vinfo->yoffset) * finfo->line_length;
@@ -44,8 +44,8 @@ void clearscreen(struct fb_var_screeninfo *vinfo,
 {
     int x, y;
 
-    for(y = 0; y < vinfo->yres; y++) {
-        for(x = 0; x < vinfo->xres; x++) {
+    for (y = 0; y < vinfo->yres; y++) {
+        for (x = 0; x < vinfo->xres; x++) {
             pixel(vinfo, finfo, fbp, x, y, 0);
         }
     }
@@ -62,9 +62,9 @@ void draw_smiles(struct fb_var_screeninfo *vinfo,
     offx = (vinfo->xres/2) - SMILES_WIDTH;
     offy = (vinfo->yres/2) - SMILES_HEIGHT;
 
-    for(y = 0; y < SMILES_HEIGHT; y++) {
-        for(x = 0; x < SMILES_WIDTH; x++) {
-            if(smiles[y][x] == '#') v = 0xff;
+    for (y = 0; y < SMILES_HEIGHT; y++) {
+        for (x = 0; x < SMILES_WIDTH; x++) {
+            if (smiles[y][x] == '#') v = 0xff;
             else v = 0;
             pixel(vinfo, finfo, fbp, x + offx, y + offy, v);
         }

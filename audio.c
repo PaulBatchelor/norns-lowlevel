@@ -17,7 +17,7 @@ static int jack_process(jack_nframes_t nframes, void *arg)
     o[0] = (jack_default_audio_sample_t*)jack_port_get_buffer(out[0], nframes);
     o[1] = (jack_default_audio_sample_t*)jack_port_get_buffer(out[1], nframes);
 
-    for(n = 0; n < nframes; n++) {
+    for (n = 0; n < nframes; n++) {
         smp = (float)rand() / RAND_MAX;
         smp = (2 * smp) - 1;
         o[0][n] = smp;
@@ -35,7 +35,7 @@ void audio_start(void)
     jack_options_t options;
     jack_status_t status;
 
-    if(client != NULL) {
+    if (client != NULL) {
         fprintf(stderr, "JACK audio server seems to be started already\n");
         return;
     }
@@ -47,7 +47,7 @@ void audio_start(void)
 
     client = jack_client_open(client_name, options, &status, server_name);
 
-    if(client == NULL) {
+    if (client == NULL) {
         fprintf(stderr, "JACK has failed you.\n");
         if (status & JackServerFailed) {
             fprintf (stderr, "It was unable to connect to the JACK server\n");
@@ -73,12 +73,12 @@ void audio_start(void)
                                     JACK_DEFAULT_AUDIO_TYPE,
                                     JackPortIsOutput, 0);
 
-    if((out[0] == NULL) || (out[1] == NULL)) {
+    if ((out[0] == NULL) || (out[1] == NULL)) {
         fprintf(stderr, "no more JACK ports available\n");
         return;
     }
 
-    if(jack_activate(client)) {
+    if (jack_activate(client)) {
         fprintf(stderr, "cannot activate client\n");
         return;
     }
@@ -104,7 +104,7 @@ void audio_start(void)
 
 void audio_stop(void)
 {
-    if(client != NULL) {
+    if (client != NULL) {
         jack_client_close (client);
         client = NULL;
     }

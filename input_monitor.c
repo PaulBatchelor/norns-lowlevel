@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
         "/dev/input/by-path/platform-keys-event",
         O_RDONLY | O_NONBLOCK);
 
-    for(k = 0; k < 3; k++) {
+    for (k = 0; k < 3; k++) {
         snprintf(tmp, 64,
                  "/dev/input/by-path/platform-soc:knob%d-event",
                  k + 1);
@@ -45,14 +45,14 @@ int main(int argc, char *argv[])
 
     running = 1;
 
-    while(running) {
+    while (running) {
         rc = read(keys_fid,
                   evt,
                   sizeof(struct input_event) * 8);
-        if(rc != -1) {
+        if (rc != -1) {
             nevts = rc / sizeof(struct input_event);
-            for(e = 0; e < nevts; e++) {
-                if(evt[e].type) {
+            for (e = 0; e < nevts; e++) {
+                if (evt[e].type) {
                     fprintf(stdout,
                             "button: %d %d\n",
                             evt[e].code,
@@ -62,14 +62,14 @@ int main(int argc, char *argv[])
             }
         }
 
-        for(k = 0; k < 3; k++) {
+        for (k = 0; k < 3; k++) {
             rc = read(knob_fid[k],
                     evt,
                     sizeof(struct input_event) * 8);
-            if(rc != -1) {
+            if (rc != -1) {
                 nevts = rc / sizeof(struct input_event);
-                for(e = 0; e < nevts; e++) {
-                    if(evt[e].type) {
+                for (e = 0; e < nevts; e++) {
+                    if (evt[e].type) {
                         fprintf(stdout,
                                 "knob%d: %d\n",
                                 k,

@@ -34,12 +34,12 @@ int main(int argc, char *argv[])
 
     running = 1;
 
-    while(running) {
+    while (running) {
         rc = read(fid, evt, sizeof(struct input_event) * 8);
-        if(rc != -1) {
+        if (rc != -1) {
             nevts = rc / sizeof(struct input_event);
-            for(e = 0; e < nevts; e++) {
-                if(evt[e].type) {
+            for (e = 0; e < nevts; e++) {
+                if (evt[e].type) {
                     fprintf(stdout,
                             "%d %d\n",
                             evt[e].code,
